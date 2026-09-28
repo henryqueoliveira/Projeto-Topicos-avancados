@@ -1,0 +1,79 @@
+CREATE DATABASE db_gerenciamento_eventos;
+
+CREATE TABLE if not exists usuarios (
+                          id SERIAL PRIMARY KEY,
+                          nome VARCHAR(150) NOT NULL,
+                          email VARCHAR(150) UNIQUE NOT NULL,
+                          senha_hash VARCHAR(255) NOT NULL,
+                          tipo_perfil VARCHAR(30) NOT NULL CHECK (tipo_perfil IN ('admin', 'organizador', 'palestrante', 'participante')),
+                          criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE if not exists eventos (
+                         id SERIAL PRIMARY KEY,
+                         titulo VARCHAR(200) NOT NULL,
+                         descricao TEXT,
+                         data_inicio TIMESTAMP NOT NULL,
+                         data_fim TIMESTAMP NOT NULL,
+                         local VARCHAR(150) NOT NULL,
+                         organizador_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
+                         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE if not exists atividades (
+                            id SERIAL PRIMARY KEY,
+                            evento_id INT REFERENCES eventos(id) ON DELETE CASCADE,
+                            titulo VARCHAR(200) NOT NULL,
+                            descricao TEXT,
+                            tipo_atividade VARCHAR(50) NOT NULL CHECK (tipo_atividade IN ('palestra', 'minicurso', 'mesa-redonda', 'workshop')),
+                            data_hora_inicio TIMESTAMP NOT NULL,
+                            data_hora_fim TIMESTAMP NOT NULL,
+                            vagas_limite INT NOT NULL,
+                            palestrante_id INT REFERENCES usuarios(id) ON DELETE SET NULL,
+                            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE if not exists inscricoes (
+                            id SERIAL PRIMARY KEY,
+                            usuario_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
+                            atividade_id INT REFERENCES atividades(id) ON DELETE CASCADE,
+                            data_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            status_presenca BOOLEAN DEFAULT FALSE,
+                            CONSTRAINT unique_inscricao UNIQUE (usuario_id, atividade_id)
+);
+
+CREATE TABLE if not exists submissoes (
+                            id SERIAL PRIMARY KEY,
+                            evento_id INT REFERENCES eventos(id) ON DELETE CASCADE,
+                            autor_id INT REFERENCES usuarios(id) ON DELETE CASCADE,
+                            titulo_artigo VARCHAR(250) NOT NULL,
+                            resumo TEXT NOT NULL,
+                            arquivo_url VARCHAR(255) NOT NULL,
+                            status VARCHAR(30) DEFAULT 'pendente' CHECK (status IN ('pendente', 'aprovado', 'rejeitado')),
+                            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO usuarios (nome, email, senha_hash, tipo_perfil) VALUES
+                                                                ('Prof. Carlos Silva', 'carlos.silva@faculdade.edu', '$2b$10$exemploHashSenhaAdmin1', 'admin'),
+                                                                ('Ana Souza', 'ana.souza@faculdade.edu', '$2b$10$exemploHashSenhaOrg2', 'organizador'),
+                                                                ('Dr. Marcos Paulo', 'marcos.paulo@ciencia.com', '$2b$10$exemploHashSenhaPal3', 'palestrante'),
+                                                                ('João Estudante', 'joao.aluno@aluno.faculdade.edu', '$2b$10$exemploHashSenhaPart4', 'participante');
+
+INSERT INTO eventos (titulo, descricao, data_inicio, data_fim, local, organizador_id) VALUES
+    ('Semana Acadêmica de Tecnologia 2026', 'Evento anual voltado para inovação, desenvolvimento web e inteligência artificial.', '2026-10-10 08:00:00', '2026-10-12 18:00:00', 'Auditório Central e Online', 2);
+
+INSERT INTO atividades (evento_id, titulo, descricao, tipo_atividade, data_hora_inicio, data_hora_fim, vagas_limite, palestrante_id) VALUES
+                                                                                                                                         (1, 'Abertura: O Futuro da Inteligência Artificial', 'Discussão sobre os impactos da IA generativa no mercado de trabalho.', 'palestra', '2026-10-10 09:00:00', '2026-10-10 11:00:00', 150, 3),
+                                                                                                                                         (1, 'Minicurso Prático de Git e GitHub', 'Oficina prática abordando versionamento de código para iniciantes.', 'minicurso', '2026-10-11 14:00:00', '2026-10-11 17:00:00', 40, 3);
+
+INSERT INTO inscricoes (usuario_id, atividade_id, status_presenca) VALUES
+    (4, 2, FALSE);
+
+INSERT INTO submissoes (evento_id, autor_id, titulo_artigo, resumo, arquivo_url, status) VALUES
+    (1, 4, 'Análise de Desempenho de Sistemas Web Responsivos', 'Este artigo aborda métricas de performance front-end em aplicações acadêmicas.', '/uploads/artigos/artigo_joao_2026.pdf', 'pendente');
+
+select * from usuarios;
+select * from eventos;
+select * from atividades;
+select * from inscricoes;
+select * from submissoes;
