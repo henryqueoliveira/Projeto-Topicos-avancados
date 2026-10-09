@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGE Acadêmico - Gerenciamento de Eventos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        /* Cabeçalho */
+        header {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-area h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .logo-area span {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        h2.section-title {
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            font-size: 1.5rem;
+        }
+        .section-subtitle {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Classes para alternar telas */
+        .hidden {
+            display: none;
+        }
+
+        /* Grid de Cards */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Cartão de Evento */
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #e5e7eb;
+        }
+        .card-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .badge {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .vagas-info {
+            font-size: 0.8rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .card h3 {
+            font-size: 1.1rem;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .card-details {
+            font-size: 0.85rem;
+            color: #374151;
+            margin-bottom: 1.25rem;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 0.75rem;
+        }
+        .card-details div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Botões */
+        .btn-inscrever {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-inscrever:hover { background-color: #4338ca; }
+        .btn-cancelar {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: none;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-cancelar:hover { background-color: #fecaca; }
+
+        /* Formulário do Painel Admin */
+        .admin-form-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            max-width: 800px;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-salvar {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-salvar:hover { background-color: #4338ca; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <h1>AcademiaEventos</h1>
+        <span>Protótipo de Gestão Acadêmica</span>
+    </div>
+    <nav>
+        <a href="#" id="link-catalogo" class="active" onclick="mudarAba('catalogo')">Catálogo</a>
+        <a href="#" id="link-painel" onclick="mudarAba('painel')">Painel Admin</a>
+    </nav>
+</header>
+
+<!-- SEÇÃO 1: CATÁLOGO DE EVENTOS -->
+<div id="secao-catalogo" class="container">
+    <h2 class="section-title">Eventos e Atividades Disponíveis</h2>
+    <p class="section-subtitle">Explore as atividades abertas e faça a sua inscrição.</p>
+
+    <div class="grid-cards">
+        <!-- Card 1 -->
+        <div class="card">
+            <div>
+                <div class="card-header-info">
+                    <span class="badge">Workshop</span>
+                    <span class="vagas-info">8 vagas restantes</span>
+                </div>
+                <h3>Arquitetura de Microsserviços com Spring Boot</h3>
+                <p>Aprenda a construir APIs escaláveis utilizando ecossistemas modernos baseados em containers e padrões corporativos.</p>
+            </div>
+            <div>
+                <div class="card-details">
+                    <div>📅 15/05/2026 às 14:00</div>
+                    <div>📍 Laboratório de Informática 02</div>
+                </div>
+                <button class="btn-cancelar">✕ Cancelar Inscrição</button>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+            <div>
+                <div class="card-header-info">
+                    <span class="badge">Palestra</span>
+                    <span class="vagas-info">5 vagas restantes</span>
+                </div>
+                <h3>Inteligência Artificial na Saúde: Desafios e Futuro</h3>
+                <p>Discussão aprofundada com pesquisadores convidados sobre modelos preditivos aplicados ao diagnóstico médico.</p>
+            </div>
+            <div>
+                <div class="card-details">
+                    <div>📅 18/05/2026 às 19:30</div>
+                    <div>📍 Auditório Principal</div>
+                </div>
+                <button class="btn-inscrever">✓ Inscrever-se</button>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+            <div>
+                <div class="card-header-info">
+                    <span class="badge">Maratona</span>
+                    <span class="vagas-info">12 vagas restantes</span>
+                </div>
+                <h3>Maratona Universitária de Programação 2026</h3>
+                <p>Competição relâmpago de resolução de algoritmos em equipes. Premiação para os três primeiros colocados.</p>
+            </div>
+            <div>
+                <div class="card-details">
+                    <div>📅 22/05/2026 às 09:00</div>
+                    <div>📍 Centro de Convenções do Campus</div>
+                </div>
+                <button class="btn-inscrever">✓ Inscrever-se</button>
+            </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card">
+            <div>
+                <div class="card-header-info">
+                    <span class="badge">Feira</span>
+                    <span class="vagas-info">115 vagas restantes</span>
+                </div>
+                <h3>Mostra de Iniciação Científica e Extensão</h3>
+                <p>Apresentação de artigos de conclusão de curso, protótipos de robótica e projetos sociais desenvolvidos pelos discentes.</p>
+            </div>
+            <div>
+                <div class="card-details">
+                    <div>📅 02/06/2026 às 08:30</div>
+                    <div>📍 Ginásio Poliesportivo</div>
+                </div>
+                <button class="btn-inscrever">✓ Inscrever-se</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEÇÃO 2: PAINEL DO ADMINISTRADOR -->
+<div id="secao-painel" class="container hidden">
+    <h2 class="section-title">Painel do Administrador</h2>
+    <p class="section-subtitle">Cadastre novas atividades e acompanhe a lotação dos eventos.</p>
+
+    <div class="admin-form-card">
+        <h3 style="margin-bottom: 1.25rem; color: #1f2937; font-size: 1.1rem;">➕ Novo Evento Acadêmico</h3>
+        <form onsubmit="event.preventDefault(); alert('Evento cadastrado com sucesso!');">
+            <div class="form-group">
+                <label>Título do Evento</label>
+                <input type="text" placeholder="Ex: Workshop de Inteligência Artificial" required>
+            </div>
+
+            <div class="form-group">
+                <label>Categoria</label>
+                <select>
+                    <option>Palestra</option>
+                    <option>Workshop</option>
+                    <option>Maratona</option>
+                    <option>Feira</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea rows="3" placeholder="Resumo dos tópicos abordados..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Data e Hora</label>
+                    <input type="datetime-local">
+                </div>
+                <div class="form-group">
+                    <label>Capacidade de Vagas</label>
+                    <input type="number" placeholder="50">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Local</label>
+                <input type="text" placeholder="Ex: Auditório Central / Lab 03">
+            </div>
+
+            <button type="submit" class="btn-salvar">Salvar Evento</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function mudarAba(aba) {
+        const secaoCatalogo = document.getElementById('secao-catalogo');
+        const secaoPainel = document.getElementById('secao-painel');
+        const linkCatalogo = document.getElementById('link-catalogo');
+        const linkPainel = document.getElementById('link-painel');
+
+        if (aba === 'catalogo') {
+            secaoCatalogo.classList.remove('hidden');
+            secaoPainel.classList.add('hidden');
+            linkCatalogo.classList.add('active');
+            linkPainel.classList.remove('active');
+        } else {
+            secaoCatalogo.classList.add('hidden');
+            secaoPainel.classList.remove('hidden');
+            linkPainel.classList.add('active');
+            linkCatalogo.classList.remove('active');
+        }
+    }
+</script>
+
+</body>
+</html>
